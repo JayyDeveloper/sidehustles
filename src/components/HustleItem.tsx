@@ -3,10 +3,12 @@ import { GripVertical, TrendingUp, DollarSign, Tag } from 'lucide-react';
 import type { Hustle, Priority } from '../types/schema';
 import { calculateHustleStats, formatCurrency } from '../lib/utils';
 import { cn } from '../lib/utils';
+import type { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities';
 
 interface HustleItemProps {
   hustle: Hustle;
   isDragging?: boolean;
+  dragListeners?: SyntheticListenerMap;
 }
 
 const priorityColors: Record<Priority, string> = {
@@ -15,7 +17,7 @@ const priorityColors: Record<Priority, string> = {
   high: 'bg-red-500/20 text-red-400 border-red-500/30',
 };
 
-export function HustleItem({ hustle, isDragging }: HustleItemProps) {
+export function HustleItem({ hustle, isDragging, dragListeners }: HustleItemProps) {
   const stats = calculateHustleStats(hustle);
   const isProfit = stats.netProfit >= 0;
 
@@ -31,7 +33,15 @@ export function HustleItem({ hustle, isDragging }: HustleItemProps) {
     >
       <div className="flex items-start gap-3">
         {/* Drag handle */}
-        <div className="flex-shrink-0 cursor-grab active:cursor-grabbing">
+        <div
+          className="flex-shrink-0 cursor-grab active:cursor-grabbing"
+          {...dragListeners}
+          onClick={(e) => {
+            // Prevent link navigation when clicking drag handle
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+        >
           <GripVertical className="w-5 h-5 text-gray-500 group-hover:text-gray-400 transition-colors" />
         </div>
 

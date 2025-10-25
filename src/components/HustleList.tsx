@@ -41,8 +41,8 @@ function SortableHustle({ hustle }: SortableHustleProps) {
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      <HustleItem hustle={hustle} isDragging={isDragging} />
+    <div ref={setNodeRef} style={style} {...attributes}>
+      <HustleItem hustle={hustle} isDragging={isDragging} dragListeners={listeners} />
     </div>
   );
 }
