@@ -30,6 +30,7 @@ export function HustleDetail() {
   const navigate = useNavigate();
   const {
     hustles,
+    loading,
     updateHustle,
     deleteHustle,
     changeStatus,
@@ -58,14 +59,22 @@ export function HustleDetail() {
   const [editDescription, setEditDescription] = useState('');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
+  // Only navigate away if not loading and hustle doesn't exist
   useEffect(() => {
-    if (!hustle) {
+    if (!loading && !hustle && hustles.length > 0) {
       navigate('/');
     }
-  }, [hustle, navigate]);
+  }, [hustle, loading, hustles.length, navigate]);
 
-  if (!hustle) {
-    return null;
+  // Show loading state instead of null to prevent flash
+  if (loading || !hustle) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center py-12">
+          <p className="text-gray-400">Loading...</p>
+        </div>
+      </div>
+    );
   }
 
   const handleUpdateBasic = async () => {

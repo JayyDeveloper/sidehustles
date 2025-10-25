@@ -25,9 +25,11 @@ export function useHustles() {
   const [error, setError] = useState<string | null>(null);
 
   // Load all hustles from IndexedDB
-  const loadHustles = useCallback(async () => {
+  const loadHustles = useCallback(async (showLoading = true) => {
     try {
-      setLoading(true);
+      if (showLoading) {
+        setLoading(true);
+      }
       const data = await hustleDB.getAll();
       // Sort by order
       data.sort((a, b) => a.order - b.order);
@@ -37,7 +39,9 @@ export function useHustles() {
       setError(err instanceof Error ? err.message : 'Failed to load hustles');
       console.error('Error loading hustles:', err);
     } finally {
-      setLoading(false);
+      if (showLoading) {
+        setLoading(false);
+      }
     }
   }, []);
 
@@ -92,7 +96,7 @@ export function useHustles() {
       };
 
       await hustleDB.add(newHustle);
-      await loadHustles();
+      await loadHustles(false);
       return newHustle;
     },
     [hustles, loadHustles]
@@ -122,7 +126,7 @@ export function useHustles() {
       };
 
       await hustleDB.update(updatedHustle);
-      await loadHustles();
+      await loadHustles(false);
       return updatedHustle;
     },
     [hustles, loadHustles]
@@ -132,7 +136,7 @@ export function useHustles() {
   const deleteHustle = useCallback(
     async (id: string): Promise<void> => {
       await hustleDB.delete(id);
-      await loadHustles();
+      await loadHustles(false);
     },
     [loadHustles]
   );
@@ -154,7 +158,7 @@ export function useHustles() {
       };
 
       await hustleDB.update(updatedHustle);
-      await loadHustles();
+      await loadHustles(false);
       return updatedHustle;
     },
     [hustles, loadHustles]
@@ -185,7 +189,7 @@ export function useHustles() {
       };
 
       await hustleDB.update(updatedHustle);
-      await loadHustles();
+      await loadHustles(false);
       return newNote;
     },
     [hustles, loadHustles]
@@ -208,7 +212,7 @@ export function useHustles() {
       };
 
       await hustleDB.update(updatedHustle);
-      await loadHustles();
+      await loadHustles(false);
     },
     [hustles, loadHustles]
   );
@@ -226,7 +230,7 @@ export function useHustles() {
       };
 
       await hustleDB.update(updatedHustle);
-      await loadHustles();
+      await loadHustles(false);
     },
     [hustles, loadHustles]
   );
@@ -256,7 +260,7 @@ export function useHustles() {
       };
 
       await hustleDB.update(updatedHustle);
-      await loadHustles();
+      await loadHustles(false);
       return newResource;
     },
     [hustles, loadHustles]
@@ -275,7 +279,7 @@ export function useHustles() {
       };
 
       await hustleDB.update(updatedHustle);
-      await loadHustles();
+      await loadHustles(false);
     },
     [hustles, loadHustles]
   );
@@ -310,10 +314,11 @@ export function useHustles() {
       };
 
       await hustleDB.update(updatedHustle);
-      await loadHustles();
+      // Update state directly instead of reloading all data
+      setHustles(hustles.map(h => h.id === hustleId ? updatedHustle : h));
       return newTransaction;
     },
-    [hustles, loadHustles]
+    [hustles]
   );
 
   // Delete a transaction
@@ -329,9 +334,10 @@ export function useHustles() {
       };
 
       await hustleDB.update(updatedHustle);
-      await loadHustles();
+      // Update state directly instead of reloading all data
+      setHustles(hustles.map(h => h.id === hustleId ? updatedHustle : h));
     },
-    [hustles, loadHustles]
+    [hustles]
   );
 
   // Duplicate a hustle
@@ -354,7 +360,7 @@ export function useHustles() {
       };
 
       await hustleDB.add(duplicated);
-      await loadHustles();
+      await loadHustles(false);
       return duplicated;
     },
     [hustles, loadHustles]
@@ -372,7 +378,7 @@ export function useHustles() {
 
       // Save all updates
       await Promise.all(updates.map((hustle) => hustleDB.update(hustle)));
-      await loadHustles();
+      await loadHustles(false);
     },
     [loadHustles]
   );
@@ -402,7 +408,7 @@ export function useHustles() {
       };
 
       await hustleDB.update(updatedHustle);
-      await loadHustles();
+      await loadHustles(false);
       return newTask;
     },
     [hustles, loadHustles]
@@ -440,7 +446,7 @@ export function useHustles() {
       };
 
       await hustleDB.update(updatedHustle);
-      await loadHustles();
+      await loadHustles(false);
     },
     [hustles, loadHustles]
   );
@@ -458,7 +464,7 @@ export function useHustles() {
       };
 
       await hustleDB.update(updatedHustle);
-      await loadHustles();
+      await loadHustles(false);
     },
     [hustles, loadHustles]
   );
@@ -491,10 +497,10 @@ export function useHustles() {
       };
 
       await hustleDB.update(updatedHustle);
-      await loadHustles();
+      setHustles(hustles.map(h => h.id === hustleId ? updatedHustle : h));
       return newGoal;
     },
-    [hustles, loadHustles]
+    [hustles]
   );
 
   // Update a goal
@@ -519,9 +525,9 @@ export function useHustles() {
       };
 
       await hustleDB.update(updatedHustle);
-      await loadHustles();
+      setHustles(hustles.map(h => h.id === hustleId ? updatedHustle : h));
     },
-    [hustles, loadHustles]
+    [hustles]
   );
 
   // Update goal progress (called when transactions are added)
@@ -548,9 +554,9 @@ export function useHustles() {
       };
 
       await hustleDB.update(updatedHustle);
-      await loadHustles();
+      setHustles(hustles.map(h => h.id === hustleId ? updatedHustle : h));
     },
-    [hustles, loadHustles]
+    [hustles]
   );
 
   // Delete a goal
@@ -566,9 +572,9 @@ export function useHustles() {
       };
 
       await hustleDB.update(updatedHustle);
-      await loadHustles();
+      setHustles(hustles.map(h => h.id === hustleId ? updatedHustle : h));
     },
-    [hustles, loadHustles]
+    [hustles]
   );
 
   // Update streak (called when work is logged)
@@ -619,7 +625,7 @@ export function useHustles() {
       };
 
       await hustleDB.update(updatedHustle);
-      await loadHustles();
+      await loadHustles(false);
     },
     [hustles, loadHustles]
   );
