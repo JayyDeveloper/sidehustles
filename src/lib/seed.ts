@@ -67,6 +67,57 @@ export const sampleHustles: Omit<Hustle, 'id' | 'order'>[] = [
         createdAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
       },
     ],
+    tasks: [
+      {
+        id: generateId(),
+        title: 'Design logo for new client',
+        completed: true,
+        createdAt: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toISOString(),
+        completedAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+      },
+      {
+        id: generateId(),
+        title: 'Send invoice to ABC Corp',
+        completed: true,
+        createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+        completedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+      },
+      {
+        id: generateId(),
+        title: 'Promote services on Instagram',
+        completed: false,
+        createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+      },
+      {
+        id: generateId(),
+        title: 'Update portfolio website',
+        completed: false,
+        createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+      },
+    ],
+    goals: [
+      {
+        id: generateId(),
+        title: 'Earn $5000 this month',
+        targetAmount: 5000,
+        currentAmount: 4300,
+        deadline: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        createdAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(),
+        completed: false,
+      },
+    ],
+    streakData: {
+      currentStreak: 5,
+      longestStreak: 12,
+      lastWorkedOn: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      workDates: [
+        new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      ],
+    },
     activityLog: [
       {
         id: generateId(),
@@ -126,6 +177,34 @@ export const sampleHustles: Omit<Hustle, 'id' | 'order'>[] = [
         createdAt: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000).toISOString(),
       },
     ],
+    tasks: [
+      {
+        id: generateId(),
+        title: 'Record Module 3',
+        completed: false,
+        createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+      },
+    ],
+    goals: [
+      {
+        id: generateId(),
+        title: 'Reach 100 students',
+        targetAmount: 1000,
+        currentAmount: 450,
+        deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        createdAt: new Date(Date.now() - 35 * 24 * 60 * 60 * 1000).toISOString(),
+        completed: false,
+      },
+    ],
+    streakData: {
+      currentStreak: 2,
+      longestStreak: 7,
+      lastWorkedOn: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      workDates: [
+        new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      ],
+    },
     activityLog: [
       {
         id: generateId(),
@@ -160,6 +239,21 @@ export const sampleHustles: Omit<Hustle, 'id' | 'order'>[] = [
       },
     ],
     transactions: [],
+    tasks: [
+      {
+        id: generateId(),
+        title: 'Learn React Native basics',
+        completed: false,
+        createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+      },
+    ],
+    goals: [],
+    streakData: {
+      currentStreak: 0,
+      longestStreak: 0,
+      lastWorkedOn: '',
+      workDates: [],
+    },
     activityLog: [
       {
         id: generateId(),
@@ -187,6 +281,14 @@ export const sampleHustles: Omit<Hustle, 'id' | 'order'>[] = [
       },
     ],
     transactions: [],
+    tasks: [],
+    goals: [],
+    streakData: {
+      currentStreak: 0,
+      longestStreak: 0,
+      lastWorkedOn: '',
+      workDates: [],
+    },
     activityLog: [
       {
         id: generateId(),

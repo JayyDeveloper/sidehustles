@@ -7,9 +7,13 @@ import type {
   Note,
   Resource,
   Transaction,
+  Task,
+  Goal,
   CreateNoteInput,
   CreateResourceInput,
   CreateTransactionInput,
+  CreateTaskInput,
+  CreateGoalInput,
   ActivityLogEntry,
 } from '../types/schema';
 import { hustleDB } from '../lib/db';
@@ -71,6 +75,14 @@ export function useHustles() {
         notes: [],
         resources: [],
         transactions: [],
+        tasks: [],
+        goals: [],
+        streakData: {
+          currentStreak: 0,
+          longestStreak: 0,
+          lastWorkedOn: '',
+          workDates: [],
+        },
         activityLog: [createActivityLog('created', `Hustle "${input.name}" created`)],
         createdAt: now,
         updatedAt: now,
@@ -365,6 +377,226 @@ export function useHustles() {
     [loadHustles]
   );
 
+  // Add a task
+  const addTask = useCallback(
+    async (hustleId: string, input: CreateTaskInput): Promise<Task | null> => {
+      const hustle = hustles.find((h) => h.id === hustleId);
+      if (!hustle) return null;
+
+      const now = new Date().toISOString();
+      const newTask: Task = {
+        id: generateId(),
+        title: input.title,
+        completed: false,
+        createdAt: now,
+      };
+
+      const updatedHustle: Hustle = {
+        ...hustle,
+        tasks: [...hustle.tasks, newTask],
+        updatedAt: now,
+        activityLog: [
+          ...hustle.activityLog,
+          createActivityLog('task_added', `Task "${input.title}" added`),
+        ],
+      };
+
+      await hustleDB.update(updatedHustle);
+      await loadHustles();
+      return newTask;
+    },
+    [hustles, loadHustles]
+  );
+
+  // Toggle task completion
+  const toggleTask = useCallback(
+    async (hustleId: string, taskId: string): Promise<void> => {
+      const hustle = hustles.find((h) => h.id === hustleId);
+      if (!hustle) return;
+
+      const now = new Date().toISOString();
+      const updatedTasks = hustle.tasks.map((task) =>
+        task.id === taskId
+          ? {
+              ...task,
+              completed: !task.completed,
+              completedAt: !task.completed ? now : undefined,
+            }
+          : task
+      );
+
+      const task = hustle.tasks.find((t) => t.id === taskId);
+      const updatedHustle: Hustle = {
+        ...hustle,
+        tasks: updatedTasks,
+        updatedAt: now,
+        activityLog: [
+          ...hustle.activityLog,
+          createActivityLog(
+            'task_completed',
+            task ? `Task "${task.title}" ${task.completed ? 'reopened' : 'completed'}` : 'Task updated'
+          ),
+        ],
+      };
+
+      await hustleDB.update(updatedHustle);
+      await loadHustles();
+    },
+    [hustles, loadHustles]
+  );
+
+  // Delete a task
+  const deleteTask = useCallback(
+    async (hustleId: string, taskId: string): Promise<void> => {
+      const hustle = hustles.find((h) => h.id === hustleId);
+      if (!hustle) return;
+
+      const updatedHustle: Hustle = {
+        ...hustle,
+        tasks: hustle.tasks.filter((task) => task.id !== taskId),
+        updatedAt: new Date().toISOString(),
+      };
+
+      await hustleDB.update(updatedHustle);
+      await loadHustles();
+    },
+    [hustles, loadHustles]
+  );
+
+  // Add a goal
+  const addGoal = useCallback(
+    async (hustleId: string, input: CreateGoalInput): Promise<Goal | null> => {
+      const hustle = hustles.find((h) => h.id === hustleId);
+      if (!hustle) return null;
+
+      const now = new Date().toISOString();
+      const newGoal: Goal = {
+        id: generateId(),
+        title: input.title,
+        targetAmount: input.targetAmount,
+        currentAmount: 0,
+        deadline: input.deadline,
+        createdAt: now,
+        completed: false,
+      };
+
+      const updatedHustle: Hustle = {
+        ...hustle,
+        goals: [...hustle.goals, newGoal],
+        updatedAt: now,
+        activityLog: [
+          ...hustle.activityLog,
+          createActivityLog('goal_added', `Goal "${input.title}" added with target of $${input.targetAmount}`),
+        ],
+      };
+
+      await hustleDB.update(updatedHustle);
+      await loadHustles();
+      return newGoal;
+    },
+    [hustles, loadHustles]
+  );
+
+  // Update goal progress (called when transactions are added)
+  const updateGoalProgress = useCallback(
+    async (hustleId: string): Promise<void> => {
+      const hustle = hustles.find((h) => h.id === hustleId);
+      if (!hustle) return;
+
+      // Calculate total income for current goals
+      const totalIncome = hustle.transactions
+        .filter((t) => t.type === 'income')
+        .reduce((sum, t) => sum + t.amount, 0);
+
+      const updatedGoals = hustle.goals.map((goal) => ({
+        ...goal,
+        currentAmount: totalIncome,
+        completed: totalIncome >= goal.targetAmount,
+      }));
+
+      const updatedHustle: Hustle = {
+        ...hustle,
+        goals: updatedGoals,
+        updatedAt: new Date().toISOString(),
+      };
+
+      await hustleDB.update(updatedHustle);
+      await loadHustles();
+    },
+    [hustles, loadHustles]
+  );
+
+  // Delete a goal
+  const deleteGoal = useCallback(
+    async (hustleId: string, goalId: string): Promise<void> => {
+      const hustle = hustles.find((h) => h.id === hustleId);
+      if (!hustle) return;
+
+      const updatedHustle: Hustle = {
+        ...hustle,
+        goals: hustle.goals.filter((goal) => goal.id !== goalId),
+        updatedAt: new Date().toISOString(),
+      };
+
+      await hustleDB.update(updatedHustle);
+      await loadHustles();
+    },
+    [hustles, loadHustles]
+  );
+
+  // Update streak (called when work is logged)
+  const updateStreak = useCallback(
+    async (hustleId: string): Promise<void> => {
+      const hustle = hustles.find((h) => h.id === hustleId);
+      if (!hustle) return;
+
+      const today = new Date().toISOString().split('T')[0];
+      const { workDates } = hustle.streakData;
+
+      // Don't update if already worked today
+      if (workDates.includes(today)) return;
+
+      const newWorkDates = [...workDates, today];
+
+      // Calculate streak
+      let currentStreak = 1;
+      const sortedDates = [...newWorkDates].sort().reverse();
+
+      for (let i = 1; i < sortedDates.length; i++) {
+        const currentDate = new Date(sortedDates[i]);
+        const previousDate = new Date(sortedDates[i - 1]);
+        const diffDays = Math.floor((previousDate.getTime() - currentDate.getTime()) / (1000 * 60 * 60 * 24));
+
+        if (diffDays === 1) {
+          currentStreak++;
+        } else {
+          break;
+        }
+      }
+
+      const longestStreak = Math.max(hustle.streakData.longestStreak, currentStreak);
+
+      const updatedHustle: Hustle = {
+        ...hustle,
+        streakData: {
+          currentStreak,
+          longestStreak,
+          lastWorkedOn: today,
+          workDates: newWorkDates,
+        },
+        updatedAt: new Date().toISOString(),
+        activityLog: [
+          ...hustle.activityLog,
+          createActivityLog('streak_updated', `Streak updated: ${currentStreak} days`),
+        ],
+      };
+
+      await hustleDB.update(updatedHustle);
+      await loadHustles();
+    },
+    [hustles, loadHustles]
+  );
+
   return {
     hustles,
     loading,
@@ -382,6 +614,13 @@ export function useHustles() {
     deleteTransaction,
     duplicateHustle,
     reorderHustles,
+    addTask,
+    toggleTask,
+    deleteTask,
+    addGoal,
+    updateGoalProgress,
+    deleteGoal,
+    updateStreak,
     reload: loadHustles,
   };
 }

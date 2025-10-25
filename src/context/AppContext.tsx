@@ -24,6 +24,13 @@ interface AppContextType {
   duplicateHustle: ReturnType<typeof useHustles>['duplicateHustle'];
   reorderHustles: ReturnType<typeof useHustles>['reorderHustles'];
   reloadHustles: ReturnType<typeof useHustles>['reload'];
+  addTask: ReturnType<typeof useHustles>['addTask'];
+  toggleTask: ReturnType<typeof useHustles>['toggleTask'];
+  deleteTask: ReturnType<typeof useHustles>['deleteTask'];
+  addGoal: ReturnType<typeof useHustles>['addGoal'];
+  updateGoalProgress: ReturnType<typeof useHustles>['updateGoalProgress'];
+  deleteGoal: ReturnType<typeof useHustles>['deleteGoal'];
+  updateStreak: ReturnType<typeof useHustles>['updateStreak'];
 
   // Settings
   settings: ReturnType<typeof useSettings>['settings'];
@@ -73,6 +80,13 @@ export function AppProvider({ children }: AppProviderProps) {
     duplicateHustle: hustlesHook.duplicateHustle,
     reorderHustles: hustlesHook.reorderHustles,
     reloadHustles: hustlesHook.reload,
+    addTask: hustlesHook.addTask,
+    toggleTask: hustlesHook.toggleTask,
+    deleteTask: hustlesHook.deleteTask,
+    addGoal: hustlesHook.addGoal,
+    updateGoalProgress: hustlesHook.updateGoalProgress,
+    deleteGoal: hustlesHook.deleteGoal,
+    updateStreak: hustlesHook.updateStreak,
 
     // Settings
     settings: settingsHook.settings,

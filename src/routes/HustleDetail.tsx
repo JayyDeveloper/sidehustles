@@ -16,6 +16,10 @@ import { NotesPanel } from '../components/NotesPanel';
 import { ResourcesPanel } from '../components/ResourcesPanel';
 import { FinancePanel } from '../components/FinancePanel';
 import { ActivityLog } from '../components/ActivityLog';
+import { TasksPanel } from '../components/TasksPanel';
+import { GoalsPanel } from '../components/GoalsPanel';
+import { ChartsPanel } from '../components/ChartsPanel';
+import { StreakCounter } from '../components/StreakCounter';
 import { Button } from '../components/Button';
 import { Input, Textarea } from '../components/Input';
 import { Card, CardBody } from '../components/Card';
@@ -37,6 +41,13 @@ export function HustleDetail() {
     addTransaction,
     deleteTransaction,
     duplicateHustle,
+    addTask,
+    toggleTask,
+    deleteTask,
+    addGoal,
+    updateGoalProgress,
+    deleteGoal,
+    updateStreak,
     toast,
   } = useApp();
 
@@ -243,14 +254,52 @@ export function HustleDetail() {
         </Card>
       </div>
 
+      {/* Streak Counter */}
+      <div className="mb-6">
+        <StreakCounter
+          streakData={hustle.streakData}
+          onLogWork={async () => {
+            await updateStreak(hustle.id);
+            toast.success('Work logged! Streak updated.');
+          }}
+        />
+      </div>
+
+      {/* Charts */}
+      <div className="mb-6">
+        <ChartsPanel transactions={hustle.transactions} />
+      </div>
+
       {/* Content panels */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left column */}
         <div className="space-y-6">
+          <TasksPanel
+            tasks={hustle.tasks}
+            onAddTask={async (data) => { await addTask(hustle.id, data); }}
+            onToggleTask={(taskId) => toggleTask(hustle.id, taskId)}
+            onDeleteTask={(taskId) => deleteTask(hustle.id, taskId)}
+          />
+
+          <GoalsPanel
+            goals={hustle.goals}
+            onAddGoal={async (data) => {
+              await addGoal(hustle.id, data);
+              await updateGoalProgress(hustle.id);
+            }}
+            onDeleteGoal={(goalId) => deleteGoal(hustle.id, goalId)}
+          />
+
           <FinancePanel
             transactions={hustle.transactions}
-            onAddTransaction={async (data) => { await addTransaction(hustle.id, data); }}
-            onDeleteTransaction={(txId) => deleteTransaction(hustle.id, txId)}
+            onAddTransaction={async (data) => {
+              await addTransaction(hustle.id, data);
+              await updateGoalProgress(hustle.id);
+            }}
+            onDeleteTransaction={async (txId) => {
+              await deleteTransaction(hustle.id, txId);
+              await updateGoalProgress(hustle.id);
+            }}
           />
 
           <NotesPanel

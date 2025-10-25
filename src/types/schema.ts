@@ -34,10 +34,35 @@ export interface Transaction {
 
 export interface ActivityLogEntry {
   id: string;
-  type: 'created' | 'updated' | 'status_changed' | 'transaction_added' | 'resource_added' | 'note_added';
+  type: 'created' | 'updated' | 'status_changed' | 'transaction_added' | 'resource_added' | 'note_added' | 'task_added' | 'task_completed' | 'goal_added' | 'streak_updated';
   description: string;
   timestamp: string;
   metadata?: Record<string, unknown>;
+}
+
+export interface Task {
+  id: string;
+  title: string;
+  completed: boolean;
+  createdAt: string;
+  completedAt?: string;
+}
+
+export interface Goal {
+  id: string;
+  title: string;
+  targetAmount: number;
+  currentAmount: number;
+  deadline: string;
+  createdAt: string;
+  completed: boolean;
+}
+
+export interface StreakData {
+  currentStreak: number;
+  longestStreak: number;
+  lastWorkedOn: string;
+  workDates: string[]; // Array of dates (YYYY-MM-DD format) when work was done
 }
 
 export interface Hustle {
@@ -48,6 +73,9 @@ export interface Hustle {
   notes: Note[];
   resources: Resource[];
   transactions: Transaction[];
+  tasks: Task[];
+  goals: Goal[];
+  streakData: StreakData;
   activityLog: ActivityLogEntry[];
   createdAt: string;
   updatedAt: string;
@@ -102,6 +130,16 @@ export interface CreateTransactionInput {
   type: TransactionType;
   date: string;
   note?: string;
+}
+
+export interface CreateTaskInput {
+  title: string;
+}
+
+export interface CreateGoalInput {
+  title: string;
+  targetAmount: number;
+  deadline: string;
 }
 
 // Filter and search types
