@@ -287,8 +287,12 @@ export function useHustles() {
   // Add a transaction
   const addTransaction = useCallback(
     async (hustleId: string, input: CreateTransactionInput): Promise<Transaction | null> => {
+      console.log('🔵 addTransaction called', { hustleId, input });
       const hustle = hustles.find((h) => h.id === hustleId);
-      if (!hustle) return null;
+      if (!hustle) {
+        console.error('❌ Hustle not found:', hustleId);
+        return null;
+      }
 
       const newTransaction: Transaction = {
         id: generateId(),
@@ -298,6 +302,8 @@ export function useHustles() {
         note: input.note,
         createdAt: new Date().toISOString(),
       };
+
+      console.log('🔵 Created transaction:', newTransaction);
 
       const updatedHustle: Hustle = {
         ...hustle,
@@ -313,10 +319,25 @@ export function useHustles() {
         ],
       };
 
-      await hustleDB.update(updatedHustle);
-      // Update state directly instead of reloading all data
-      setHustles(hustles.map(h => h.id === hustleId ? updatedHustle : h));
-      return newTransaction;
+      console.log('🔵 Updated hustle:', {
+        id: updatedHustle.id,
+        transactionCount: updatedHustle.transactions.length,
+        activityLogCount: updatedHustle.activityLog.length
+      });
+
+      try {
+        await hustleDB.update(updatedHustle);
+        console.log('✅ Transaction saved to DB');
+
+        // Update state directly instead of reloading all data
+        setHustles(hustles.map(h => h.id === hustleId ? updatedHustle : h));
+        console.log('✅ State updated');
+
+        return newTransaction;
+      } catch (error) {
+        console.error('❌ Failed to save transaction:', error);
+        throw error;
+      }
     },
     [hustles]
   );
