@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generate Icons</title>
+</head>
+<body>
+    <h1>Icon Generator</h1>
+    <p>Icons will be generated below. Right-click and save each one.</p>
+    <div id="icons"></div>
+
+    <script>
+        const sizes = [72, 96, 128, 144, 152, 192, 384, 512];
+        const container = document.getElementById('icons');
+
+        sizes.forEach(size => {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+
+            // Create gradient background
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, '#22d3ee');
+            gradient.addColorStop(1, '#0891b2');
+            ctx.fillStyle = gradient;
+
+            // Draw rounded rectangle
+            const radius = size * 0.2;
+            ctx.beginPath();
+            ctx.moveTo(radius, 0);
+            ctx.lineTo(size - radius, 0);
+            ctx.quadraticCurveTo(size, 0, size, radius);
+            ctx.lineTo(size, size - radius);
+            ctx.quadraticCurveTo(size, size, size - radius, size);
+            ctx.lineTo(radius, size);
+            ctx.quadraticCurveTo(0, size, 0, size - radius);
+            ctx.lineTo(0, radius);
+            ctx.quadraticCurveTo(0, 0, radius, 0);
+            ctx.closePath();
+            ctx.fill();
+
+            // Draw letter H
+            ctx.fillStyle = 'white';
+            ctx.font = `bold ${size * 0.6}px system-ui`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('H', size / 2, size / 2);
+
+            // Add to page
+            const wrapper = document.createElement('div');
+            wrapper.style.margin = '20px';
+            const label = document.createElement('div');
+            label.textContent = `icon-${size}x${size}.png`;
+            wrapper.appendChild(label);
+            wrapper.appendChild(canvas);
+
+            // Create download link
+            const link = document.createElement('a');
+            link.download = `icon-${size}x${size}.png`;
+            link.href = canvas.toDataURL();
+            link.textContent = 'Download';
+            link.style.display = 'block';
+            link.style.marginTop = '5px';
+            wrapper.appendChild(link);
+
+            container.appendChild(wrapper);
+        });
+    </script>
+</body>
+</html>
