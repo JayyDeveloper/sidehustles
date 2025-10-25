@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Plus, Search, Filter } from 'lucide-react';
+import { Plus, Search, Filter, RefreshCw } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { HustleList } from '../components/HustleList';
 import { Analytics } from '../components/Analytics';
@@ -8,12 +8,29 @@ import { HustleForm } from '../components/HustleForm';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 import type { CreateHustleInput, Hustle } from '../types/schema';
+import { clearDatabase, seedDatabase } from '../lib/seed';
 
 export function Dashboard() {
-  const { hustles, createHustle, reorderHustles, toast } = useApp();
+  const { hustles, createHustle, reorderHustles, reloadHustles, toast } = useApp();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+
+  const handleResetDatabase = async () => {
+    if (!confirm('⚠️ This will delete ALL your data and reload sample hustles. Continue?')) {
+      return;
+    }
+
+    try {
+      await clearDatabase();
+      await seedDatabase();
+      await reloadHustles();
+      toast.success('Database reset successfully with sample data');
+    } catch (error) {
+      toast.error('Failed to reset database');
+      console.error(error);
+    }
+  };
 
   // Filter hustles by status
   const activeHustles = useMemo(() => {
@@ -99,7 +116,7 @@ export function Dashboard() {
       </div>
 
       {/* Hustle lists */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <HustleList
           title="Active Hustles"
           hustles={activeHustles}
@@ -115,6 +132,26 @@ export function Dashboard() {
           onReorder={handleReorderFuture}
           onAdd={() => setIsCreateModalOpen(true)}
         />
+      </div>
+
+      {/* Developer Tools */}
+      <div className="mt-8 p-4 rounded-xl bg-yellow-500/10 border border-yellow-500/20">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-sm font-semibold text-yellow-400 mb-1">Developer Tools</h3>
+            <p className="text-xs text-gray-400">
+              Reset database to sample data (useful if data isn't persisting)
+            </p>
+          </div>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={handleResetDatabase}
+          >
+            <RefreshCw className="w-4 h-4" />
+            Reset Database
+          </Button>
+        </div>
       </div>
 
       {/* Create hustle modal */}

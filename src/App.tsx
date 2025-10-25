@@ -6,15 +6,22 @@ import { ToastContainer } from './components/Toast';
 import { Dashboard } from './routes/Dashboard';
 import { HustleDetail } from './routes/HustleDetail';
 import { initDB } from './lib/db';
+import { seedDatabase } from './lib/seed';
 
 function AppContent() {
   const { toasts, removeToast } = useApp();
 
   // Initialize database on mount
   useEffect(() => {
-    initDB().catch((err) => {
-      console.error('Failed to initialize database:', err);
-    });
+    const init = async () => {
+      try {
+        await initDB();
+        await seedDatabase();
+      } catch (err) {
+        console.error('Failed to initialize database:', err);
+      }
+    };
+    init();
   }, []);
 
   return (
