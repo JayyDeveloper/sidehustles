@@ -28,6 +28,7 @@ interface AppContextType {
   toggleTask: ReturnType<typeof useHustles>['toggleTask'];
   deleteTask: ReturnType<typeof useHustles>['deleteTask'];
   addGoal: ReturnType<typeof useHustles>['addGoal'];
+  updateGoal: ReturnType<typeof useHustles>['updateGoal'];
   updateGoalProgress: ReturnType<typeof useHustles>['updateGoalProgress'];
   deleteGoal: ReturnType<typeof useHustles>['deleteGoal'];
   updateStreak: ReturnType<typeof useHustles>['updateStreak'];
@@ -84,6 +85,7 @@ export function AppProvider({ children }: AppProviderProps) {
     toggleTask: hustlesHook.toggleTask,
     deleteTask: hustlesHook.deleteTask,
     addGoal: hustlesHook.addGoal,
+    updateGoal: hustlesHook.updateGoal,
     updateGoalProgress: hustlesHook.updateGoalProgress,
     deleteGoal: hustlesHook.deleteGoal,
     updateStreak: hustlesHook.updateStreak,

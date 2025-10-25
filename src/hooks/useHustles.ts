@@ -497,6 +497,33 @@ export function useHustles() {
     [hustles, loadHustles]
   );
 
+  // Update a goal
+  const updateGoal = useCallback(
+    async (hustleId: string, goalId: string, updates: Partial<Pick<Goal, 'title' | 'targetAmount' | 'currentAmount' | 'deadline'>>): Promise<void> => {
+      const hustle = hustles.find((h) => h.id === hustleId);
+      if (!hustle) return;
+
+      const updatedGoals = hustle.goals.map((goal) => {
+        if (goal.id !== goalId) return goal;
+
+        const updatedGoal = { ...goal, ...updates };
+        // Check if goal is now completed
+        updatedGoal.completed = updatedGoal.currentAmount >= updatedGoal.targetAmount;
+        return updatedGoal;
+      });
+
+      const updatedHustle: Hustle = {
+        ...hustle,
+        goals: updatedGoals,
+        updatedAt: new Date().toISOString(),
+      };
+
+      await hustleDB.update(updatedHustle);
+      await loadHustles();
+    },
+    [hustles, loadHustles]
+  );
+
   // Update goal progress (called when transactions are added)
   const updateGoalProgress = useCallback(
     async (hustleId: string): Promise<void> => {
@@ -618,6 +645,7 @@ export function useHustles() {
     toggleTask,
     deleteTask,
     addGoal,
+    updateGoal,
     updateGoalProgress,
     deleteGoal,
     updateStreak,

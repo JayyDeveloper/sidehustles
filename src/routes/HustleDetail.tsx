@@ -45,6 +45,7 @@ export function HustleDetail() {
     toggleTask,
     deleteTask,
     addGoal,
+    updateGoal,
     updateGoalProgress,
     deleteGoal,
     updateStreak,
@@ -287,6 +288,7 @@ export function HustleDetail() {
               await addGoal(hustle.id, data);
               await updateGoalProgress(hustle.id);
             }}
+            onUpdateGoal={(goalId, updates) => updateGoal(hustle.id, goalId, updates)}
             onDeleteGoal={(goalId) => deleteGoal(hustle.id, goalId)}
           />
 

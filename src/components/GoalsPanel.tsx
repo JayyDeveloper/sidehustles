@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Target, Trash2, Check } from 'lucide-react';
+import { Plus, Target, Trash2, Check, Edit2 } from 'lucide-react';
 import type { Goal, CreateGoalInput } from '../types/schema';
 import { formatCurrency, formatDate } from '../lib/utils';
 import { Card, CardHeader, CardBody } from './Card';
@@ -9,16 +9,19 @@ import { Input } from './Input';
 interface GoalsPanelProps {
   goals: Goal[];
   onAddGoal: (data: CreateGoalInput) => Promise<void>;
+  onUpdateGoal: (goalId: string, updates: Partial<Pick<Goal, 'title' | 'targetAmount' | 'currentAmount' | 'deadline'>>) => Promise<void>;
   onDeleteGoal: (goalId: string) => Promise<void>;
 }
 
-export function GoalsPanel({ goals, onAddGoal, onDeleteGoal }: GoalsPanelProps) {
+export function GoalsPanel({ goals, onAddGoal, onUpdateGoal, onDeleteGoal }: GoalsPanelProps) {
   const [isAdding, setIsAdding] = useState(false);
+  const [editingGoalId, setEditingGoalId] = useState<string | null>(null);
   const [formData, setFormData] = useState<CreateGoalInput>({
     title: '',
     targetAmount: 0,
     deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
   });
+  const [editData, setEditData] = useState<Partial<Goal> | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,6 +41,36 @@ export function GoalsPanel({ goals, onAddGoal, onDeleteGoal }: GoalsPanelProps) 
     } catch (error) {
       console.error('Failed to add goal:', error);
     }
+  };
+
+  const handleEdit = (goal: Goal) => {
+    setEditingGoalId(goal.id);
+    setEditData({
+      title: goal.title,
+      targetAmount: goal.targetAmount,
+      currentAmount: goal.currentAmount,
+      deadline: goal.deadline,
+    });
+    setIsAdding(false);
+  };
+
+  const handleUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!editingGoalId || !editData) return;
+
+    try {
+      await onUpdateGoal(editingGoalId, editData);
+      setEditingGoalId(null);
+      setEditData(null);
+    } catch (error) {
+      console.error('Failed to update goal:', error);
+    }
+  };
+
+  const cancelEdit = () => {
+    setEditingGoalId(null);
+    setEditData(null);
   };
 
   const calculateProgress = (goal: Goal): number => {
@@ -131,7 +164,65 @@ export function GoalsPanel({ goals, onAddGoal, onDeleteGoal }: GoalsPanelProps) 
             {goals.map((goal) => {
               const progress = calculateProgress(goal);
               const overdue = isOverdue(goal.deadline);
+              const isEditing = editingGoalId === goal.id;
 
+              // Show edit form for this goal
+              if (isEditing && editData) {
+                return (
+                  <form
+                    key={goal.id}
+                    onSubmit={handleUpdate}
+                    className="p-4 rounded-xl bg-accent-500/10 border border-accent-500/20 space-y-3"
+                  >
+                    <Input
+                      label="Goal Title"
+                      value={editData.title || ''}
+                      onChange={(e) => setEditData({ ...editData, title: e.target.value })}
+                      required
+                      autoFocus
+                    />
+                    <Input
+                      label="Target Amount"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={editData.targetAmount || ''}
+                      onChange={(e) =>
+                        setEditData({ ...editData, targetAmount: parseFloat(e.target.value) || 0 })
+                      }
+                      required
+                    />
+                    <Input
+                      label="Current Amount"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={editData.currentAmount || ''}
+                      onChange={(e) =>
+                        setEditData({ ...editData, currentAmount: parseFloat(e.target.value) || 0 })
+                      }
+                      required
+                    />
+                    <Input
+                      label="Deadline"
+                      type="date"
+                      value={editData.deadline || ''}
+                      onChange={(e) => setEditData({ ...editData, deadline: e.target.value })}
+                      required
+                    />
+                    <div className="flex gap-2">
+                      <Button type="submit" size="sm">
+                        Save Changes
+                      </Button>
+                      <Button type="button" size="sm" variant="secondary" onClick={cancelEdit}>
+                        Cancel
+                      </Button>
+                    </div>
+                  </form>
+                );
+              }
+
+              // Show normal goal card
               return (
                 <div
                   key={goal.id}
@@ -164,13 +255,22 @@ export function GoalsPanel({ goals, onAddGoal, onDeleteGoal }: GoalsPanelProps) 
                         </p>
                       </div>
                     </div>
-                    <button
-                      onClick={() => onDeleteGoal(goal.id)}
-                      className="p-1.5 rounded-lg hover:bg-red-500/10 text-red-400 hover:text-red-300 transition-colors"
-                      aria-label="Delete goal"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    <div className="flex gap-1">
+                      <button
+                        onClick={() => handleEdit(goal)}
+                        className="p-1.5 rounded-lg hover:bg-accent-500/10 text-accent-400 hover:text-accent-300 transition-colors"
+                        aria-label="Edit goal"
+                      >
+                        <Edit2 className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => onDeleteGoal(goal.id)}
+                        className="p-1.5 rounded-lg hover:bg-red-500/10 text-red-400 hover:text-red-300 transition-colors"
+                        aria-label="Delete goal"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
 
                   {/* Progress bar */}
