@@ -288,11 +288,15 @@ export function useHustles() {
   const addTransaction = useCallback(
     async (hustleId: string, input: CreateTransactionInput): Promise<Transaction | null> => {
       console.log('🔵 addTransaction called', { hustleId, input });
-      const hustle = hustles.find((h) => h.id === hustleId);
+
+      // Get fresh data from DB to avoid stale closure
+      const freshData = await hustleDB.getAll();
+      const hustle = freshData.find((h) => h.id === hustleId);
       if (!hustle) {
         console.error('❌ Hustle not found:', hustleId);
         return null;
       }
+      console.log('🔵 Using fresh hustle data. Current activity log length:', hustle.activityLog.length);
 
       const newTransaction: Transaction = {
         id: generateId(),
@@ -329,9 +333,13 @@ export function useHustles() {
         await hustleDB.update(updatedHustle);
         console.log('✅ Transaction saved to DB');
 
-        // Update state directly instead of reloading all data
-        setHustles(prevHustles => prevHustles.map(h => h.id === hustleId ? updatedHustle : h));
-        console.log('✅ State updated');
+        // Update state using functional form to avoid stale closure
+        setHustles(prevHustles => {
+          const updated = prevHustles.map(h => h.id === hustleId ? updatedHustle : h);
+          console.log('✅ State updated - new activity log length:',
+            updated.find(h => h.id === hustleId)?.activityLog.length);
+          return updated;
+        });
 
         return newTransaction;
       } catch (error) {
@@ -339,7 +347,7 @@ export function useHustles() {
         throw error;
       }
     },
-    [hustles]
+    [] // No dependencies - we fetch fresh data from DB each time
   );
 
   // Delete a transaction
