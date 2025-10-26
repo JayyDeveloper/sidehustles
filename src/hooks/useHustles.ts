@@ -296,7 +296,7 @@ export function useHustles() {
         console.error('❌ Hustle not found:', hustleId);
         return null;
       }
-      console.log('🔵 Using fresh hustle data. Current activity log length:', hustle.activityLog.length);
+      console.log('🔵 Fresh data loaded from DB:', { hustleId: hustle.id, currentTransactionCount: hustle.transactions.length, currentActivityLogCount: hustle.activityLog.length });
 
       const newTransaction: Transaction = {
         id: generateId(),
