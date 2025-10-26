@@ -114,7 +114,12 @@ export function closeDB(): void {
 export const hustleDB = {
   async getAll(): Promise<Hustle[]> {
     const db = await getDB();
-    return await db.getAll('hustles');
+    const hustles = await db.getAll('hustles');
+    console.log('📖 DB.getAll returned', hustles.length, 'hustles');
+    hustles.forEach(h => {
+      console.log(`📖   - ${h.id}: ${h.transactions.length} transactions, ${h.activityLog.length} activities`);
+    });
+    return hustles;
   },
 
   async getById(id: string): Promise<Hustle | undefined> {
@@ -134,7 +139,13 @@ export const hustleDB = {
 
   async update(hustle: Hustle): Promise<string> {
     const db = await getDB();
-    return await db.put('hustles', hustle);
+    console.log('💾 DB.update called for hustle:', hustle.id, 'transactions:', hustle.transactions.length, 'activities:', hustle.activityLog.length);
+    const result = await db.put('hustles', hustle);
+    console.log('💾 DB.update completed, key:', result);
+    // Verify it was actually saved
+    const saved = await db.get('hustles', hustle.id);
+    console.log('💾 DB.update verified - saved transactions:', saved?.transactions.length, 'saved activities:', saved?.activityLog.length);
+    return result;
   },
 
   async delete(id: string): Promise<void> {
