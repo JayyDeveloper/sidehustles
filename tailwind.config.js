@@ -28,12 +28,26 @@ export default {
       },
       backdropBlur: {
         xs: '2px',
+        '3xl': '64px',
+      },
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+        'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+        'glass-gradient': 'linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))',
+        'glass-gradient-dark': 'linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02))',
       },
       animation: {
         'slide-up': 'slideUp 0.3s ease-out',
         'slide-down': 'slideDown 0.3s ease-out',
         'fade-in': 'fadeIn 0.2s ease-out',
         'scale-in': 'scaleIn 0.2s ease-out',
+        'gradient': 'gradient 8s linear infinite',
+        'shimmer': 'shimmer 2s linear infinite',
+        'blob': 'blob 7s infinite',
+      },
+      animationDelay: {
+        '2000': '2s',
+        '4000': '4s',
       },
       keyframes: {
         slideUp: {
@@ -52,10 +66,28 @@ export default {
           '0%': { transform: 'scale(0.95)', opacity: '0' },
           '100%': { transform: 'scale(1)', opacity: '1' },
         },
+        gradient: {
+          '0%, 100%': { backgroundPosition: '0% 50%' },
+          '50%': { backgroundPosition: '100% 50%' },
+        },
+        shimmer: {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(100%)' },
+        },
+        blob: {
+          '0%': { transform: 'translate(0px, 0px) scale(1)' },
+          '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+          '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+          '100%': { transform: 'translate(0px, 0px) scale(1)' },
+        },
       },
       boxShadow: {
-        glass: '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
-        'glass-lg': '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
+        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.15)',
+        'glass-lg': '0 12px 48px 0 rgba(31, 38, 135, 0.25)',
+        'glass-xl': '0 20px 64px 0 rgba(31, 38, 135, 0.35)',
+        'inner-glow': 'inset 0 1px 0 0 rgba(255, 255, 255, 0.1)',
+        'glow': '0 0 20px rgba(34, 211, 238, 0.3)',
+        'glow-lg': '0 0 40px rgba(34, 211, 238, 0.4)',
       },
     },
   },

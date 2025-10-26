@@ -10,13 +10,13 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variants = {
   primary:
-    'bg-accent-500 hover:bg-accent-600 text-white border-accent-500/20 shadow-lg shadow-accent-500/20',
+    'bg-gradient-to-r from-accent-500 to-accent-600 hover:from-accent-600 hover:to-accent-700 text-white border-transparent shadow-glow hover:shadow-glow-lg',
   secondary:
-    'bg-white/5 hover:bg-white/10 text-gray-300 border-white/10',
+    'bg-gray-100 hover:bg-gray-200 text-gray-700 border-gray-300/50 dark:bg-white/5 dark:hover:bg-white/10 dark:text-gray-300 dark:border-white/10 backdrop-blur-xl',
   ghost:
-    'bg-transparent hover:bg-white/5 text-gray-300 border-transparent',
+    'bg-transparent hover:bg-gray-100 text-gray-700 border-transparent dark:hover:bg-white/5 dark:text-gray-300',
   danger:
-    'bg-red-500/10 hover:bg-red-500/20 text-red-400 border-red-500/20',
+    'bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white border-transparent shadow-lg shadow-red-500/20',
 };
 
 const sizes = {
@@ -37,9 +37,11 @@ export function Button({
     <button
       className={cn(
         'inline-flex items-center justify-center gap-2 rounded-xl font-medium',
-        'border backdrop-blur-sm transition-all duration-200',
-        'focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-offset-2 focus:ring-offset-gray-900',
+        'border transition-all duration-300 transform',
+        'focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-offset-2',
+        'focus:ring-offset-gray-100 dark:focus:ring-offset-gray-900',
         'disabled:opacity-50 disabled:cursor-not-allowed',
+        'active:scale-95',
         variants[variant],
         sizes[size],
         className

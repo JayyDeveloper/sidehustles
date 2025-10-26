@@ -287,16 +287,10 @@ export function useHustles() {
   // Add a transaction
   const addTransaction = useCallback(
     async (hustleId: string, input: CreateTransactionInput): Promise<Transaction | null> => {
-      console.log('🔵 addTransaction called', { hustleId, input });
-
       // Get fresh data from DB to avoid stale closure
       const freshData = await hustleDB.getAll();
       const hustle = freshData.find((h) => h.id === hustleId);
-      if (!hustle) {
-        console.error('❌ Hustle not found:', hustleId);
-        return null;
-      }
-      console.log('🔵 Fresh data loaded from DB:', { hustleId: hustle.id, currentTransactionCount: hustle.transactions.length, currentActivityLogCount: hustle.activityLog.length });
+      if (!hustle) return null;
 
       const newTransaction: Transaction = {
         id: generateId(),
@@ -306,8 +300,6 @@ export function useHustles() {
         note: input.note,
         createdAt: new Date().toISOString(),
       };
-
-      console.log('🔵 Created transaction:', newTransaction);
 
       const updatedHustle: Hustle = {
         ...hustle,
@@ -323,29 +315,9 @@ export function useHustles() {
         ],
       };
 
-      console.log('🔵 Updated hustle:', {
-        id: updatedHustle.id,
-        transactionCount: updatedHustle.transactions.length,
-        activityLogCount: updatedHustle.activityLog.length
-      });
-
-      try {
-        await hustleDB.update(updatedHustle);
-        console.log('✅ Transaction saved to DB');
-
-        // Update state using functional form to avoid stale closure
-        setHustles(prevHustles => {
-          const updated = prevHustles.map(h => h.id === hustleId ? updatedHustle : h);
-          console.log('✅ State updated - new activity log length:',
-            updated.find(h => h.id === hustleId)?.activityLog.length);
-          return updated;
-        });
-
-        return newTransaction;
-      } catch (error) {
-        console.error('❌ Failed to save transaction:', error);
-        throw error;
-      }
+      await hustleDB.update(updatedHustle);
+      setHustles(prevHustles => prevHustles.map(h => h.id === hustleId ? updatedHustle : h));
+      return newTransaction;
     },
     [] // No dependencies - we fetch fresh data from DB each time
   );
@@ -562,7 +534,8 @@ export function useHustles() {
   // Update goal progress (called when transactions are added)
   const updateGoalProgress = useCallback(
     async (hustleId: string): Promise<void> => {
-      const hustle = hustles.find((h) => h.id === hustleId);
+      // IMPORTANT: Reload from DB to get the latest data including newly added transactions
+      const hustle = await hustleDB.getById(hustleId);
       if (!hustle) return;
 
       // Calculate total income for current goals
@@ -585,7 +558,7 @@ export function useHustles() {
       await hustleDB.update(updatedHustle);
       setHustles(prevHustles => prevHustles.map(h => h.id === hustleId ? updatedHustle : h));
     },
-    [hustles]
+    []
   );
 
   // Delete a goal

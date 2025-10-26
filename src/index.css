@@ -5,7 +5,8 @@
 @layer base {
 
   body {
-    @apply bg-gray-900 text-gray-100 antialiased;
+    @apply bg-gray-50 text-gray-900 antialiased;
+    @apply dark:bg-gray-900 dark:text-gray-100;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
       'Helvetica Neue', Arial, sans-serif;
   }
@@ -16,31 +17,60 @@
   }
 
   ::-webkit-scrollbar-track {
-    @apply bg-gray-900;
+    @apply bg-gray-200;
+    @apply dark:bg-gray-900;
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-gray-700 rounded-full;
+    @apply bg-gray-400 rounded-full;
+    @apply dark:bg-gray-700;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-gray-600;
+    @apply bg-gray-500;
+    @apply dark:bg-gray-600;
   }
 }
 
 @layer components {
-  /* Glass morphism utilities */
+  /* Enhanced Glass morphism utilities */
   .glass-panel {
-    @apply rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl shadow-glass;
+    @apply rounded-2xl border backdrop-blur-3xl shadow-glass;
+    @apply border-gray-300/30 bg-gradient-to-br from-white/90 via-white/70 to-white/80;
+    @apply dark:border-white/10 dark:from-white/[0.08] dark:via-white/[0.05] dark:to-white/[0.03];
+    @apply shadow-inner-glow;
   }
 
   .glass-panel-hover {
-    @apply glass-panel hover:bg-white/10 hover:shadow-glass-lg transition-all duration-200;
+    @apply glass-panel hover:shadow-glass-lg transition-all duration-300;
+    @apply hover:from-white/95 hover:via-white/80 hover:to-white/90;
+    @apply dark:hover:from-white/[0.12] dark:hover:via-white/[0.08] dark:hover:to-white/[0.06];
+    @apply hover:scale-[1.01];
+  }
+
+  /* Gradient text utilities */
+  .gradient-text {
+    @apply bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-accent-400 via-accent-500 to-accent-600;
+  }
+
+  .gradient-text-animated {
+    @apply gradient-text bg-[length:200%_auto] animate-gradient;
+  }
+
+  /* Animation delays */
+  .animation-delay-2000 {
+    animation-delay: 2s;
+  }
+
+  .animation-delay-4000 {
+    animation-delay: 4s;
   }
 
   /* Custom prose styles for markdown */
   .prose-invert {
-    @apply text-gray-300;
+    @apply text-gray-700;
+    @apply dark:text-gray-300;
   }
 
   .prose-invert h1,
@@ -49,19 +79,23 @@
   .prose-invert h4,
   .prose-invert h5,
   .prose-invert h6 {
-    @apply text-gray-100 font-bold;
+    @apply text-gray-900 font-bold;
+    @apply dark:text-gray-100;
   }
 
   .prose-invert a {
-    @apply text-accent-400 hover:text-accent-300 underline;
+    @apply text-accent-600 hover:text-accent-700 underline;
+    @apply dark:text-accent-400 dark:hover:text-accent-300;
   }
 
   .prose-invert code {
-    @apply bg-white/10 px-1.5 py-0.5 rounded text-accent-400;
+    @apply bg-gray-200 px-1.5 py-0.5 rounded text-accent-600;
+    @apply dark:bg-white/10 dark:text-accent-400;
   }
 
   .prose-invert pre {
-    @apply bg-white/5 border border-white/10 rounded-xl p-4 overflow-x-auto;
+    @apply bg-gray-100 border border-gray-300 rounded-xl p-4 overflow-x-auto;
+    @apply dark:bg-white/5 dark:border-white/10;
   }
 
   .prose-invert ul,
@@ -74,27 +108,8 @@
   }
 
   .prose-invert blockquote {
-    @apply border-l-4 border-accent-500 pl-4 italic text-gray-400;
+    @apply border-l-4 border-accent-500 pl-4 italic;
+    @apply text-gray-600;
+    @apply dark:text-gray-400;
   }
-}
-
-/* Light theme overrides */
-.light {
-  @apply bg-gray-50 text-gray-900;
-}
-
-.light .glass-panel {
-  @apply bg-gray-100/80 border-gray-300/50;
-}
-
-.light ::-webkit-scrollbar-track {
-  @apply bg-gray-100;
-}
-
-.light ::-webkit-scrollbar-thumb {
-  @apply bg-gray-400;
-}
-
-.light ::-webkit-scrollbar-thumb:hover {
-  @apply bg-gray-500;
 }

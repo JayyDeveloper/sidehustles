@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -53,7 +53,8 @@ export function HustleDetail() {
     toast,
   } = useApp();
 
-  const hustle = hustles.find((h) => h.id === id);
+  const hustle = useMemo(() => hustles.find((h) => h.id === id), [hustles, id]);
+
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState('');
   const [editDescription, setEditDescription] = useState('');
