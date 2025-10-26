@@ -330,7 +330,7 @@ export function useHustles() {
         console.log('✅ Transaction saved to DB');
 
         // Update state directly instead of reloading all data
-        setHustles(hustles.map(h => h.id === hustleId ? updatedHustle : h));
+        setHustles(prevHustles => prevHustles.map(h => h.id === hustleId ? updatedHustle : h));
         console.log('✅ State updated');
 
         return newTransaction;
@@ -356,7 +356,7 @@ export function useHustles() {
 
       await hustleDB.update(updatedHustle);
       // Update state directly instead of reloading all data
-      setHustles(hustles.map(h => h.id === hustleId ? updatedHustle : h));
+      setHustles(prevHustles => prevHustles.map(h => h.id === hustleId ? updatedHustle : h));
     },
     [hustles]
   );
@@ -518,7 +518,7 @@ export function useHustles() {
       };
 
       await hustleDB.update(updatedHustle);
-      setHustles(hustles.map(h => h.id === hustleId ? updatedHustle : h));
+      setHustles(prevHustles => prevHustles.map(h => h.id === hustleId ? updatedHustle : h));
       return newGoal;
     },
     [hustles]
@@ -546,7 +546,7 @@ export function useHustles() {
       };
 
       await hustleDB.update(updatedHustle);
-      setHustles(hustles.map(h => h.id === hustleId ? updatedHustle : h));
+      setHustles(prevHustles => prevHustles.map(h => h.id === hustleId ? updatedHustle : h));
     },
     [hustles]
   );
@@ -575,7 +575,7 @@ export function useHustles() {
       };
 
       await hustleDB.update(updatedHustle);
-      setHustles(hustles.map(h => h.id === hustleId ? updatedHustle : h));
+      setHustles(prevHustles => prevHustles.map(h => h.id === hustleId ? updatedHustle : h));
     },
     [hustles]
   );
@@ -593,7 +593,7 @@ export function useHustles() {
       };
 
       await hustleDB.update(updatedHustle);
-      setHustles(hustles.map(h => h.id === hustleId ? updatedHustle : h));
+      setHustles(prevHustles => prevHustles.map(h => h.id === hustleId ? updatedHustle : h));
     },
     [hustles]
   );
