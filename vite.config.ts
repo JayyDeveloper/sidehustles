@@ -90,7 +90,7 @@ export default defineConfig({
         ]
       },
       devOptions: {
-        enabled: true,
+        enabled: false, // Disabled for debugging
         type: 'module'
       }
     })
