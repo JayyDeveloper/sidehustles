@@ -6,7 +6,6 @@ import { ToastContainer } from './components/Toast';
 import { Dashboard } from './routes/Dashboard';
 import { HustleDetail } from './routes/HustleDetail';
 import { initDB } from './lib/db';
-import { seedDatabase } from './lib/seed';
 
 function AppContent() {
   const { toasts, removeToast } = useApp();
@@ -16,7 +15,6 @@ function AppContent() {
     const init = async () => {
       try {
         await initDB();
-        await seedDatabase();
       } catch (err) {
         console.error('Failed to initialize database:', err);
       }
