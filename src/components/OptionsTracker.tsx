@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, TrendingUp, DollarSign, Check, X, Edit2, Trash2 } from 'lucide-react';
+import { Plus, TrendingUp, Check, X, Trash2 } from 'lucide-react';
 import type { OptionTrade, CreateOptionTradeInput, OptionStatus, OptionType } from '../types/schema';
 import { optionsDB } from '../lib/db';
 import { generateId, formatCurrency, formatDate } from '../lib/utils';
