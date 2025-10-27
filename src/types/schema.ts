@@ -171,6 +171,52 @@ export interface ExportData {
   settings: AppSettings;
 }
 
+// Options Trading Types
+export type OptionType = 'call' | 'put';
+export type OptionStatus = 'open' | 'closed' | 'assigned' | 'expired';
+
+export interface OptionTrade {
+  id: string;
+  symbol: string;
+  strike: number;
+  expiration: string; // YYYY-MM-DD
+  type: OptionType;
+  premium: number; // Premium collected (positive) or paid (negative)
+  quantity: number; // Number of contracts
+  status: OptionStatus;
+  assignedShares?: number; // Number of shares if assigned
+  assignmentPrice?: number; // Cost basis per share after assignment
+  closedPrice?: number; // Price when closed (if closed early)
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface OptionTradeStats {
+  totalPremium: number;
+  openPositions: number;
+  closedProfit: number;
+  assignedValue: number;
+}
+
+export interface CreateOptionTradeInput {
+  symbol: string;
+  strike: number;
+  expiration: string;
+  type: OptionType;
+  premium: number;
+  quantity: number;
+  notes?: string;
+}
+
+export interface UpdateOptionTradeInput {
+  status?: OptionStatus;
+  assignedShares?: number;
+  assignmentPrice?: number;
+  closedPrice?: number;
+  notes?: string;
+}
+
 // Utility types
 export type SortField = 'name' | 'createdAt' | 'updatedAt' | 'priority';
 export type SortDirection = 'asc' | 'desc';

@@ -1,6 +1,6 @@
 import { openDB } from 'idb';
 import type { DBSchema, IDBPDatabase } from 'idb';
-import type { Hustle, AppSettings, SyncQueueItem } from '../types/schema';
+import type { Hustle, AppSettings, SyncQueueItem, OptionTrade } from '../types/schema';
 
 /**
  * IndexedDB schema definition
@@ -28,10 +28,19 @@ interface HustleboardDB extends DBSchema {
       'by-timestamp': string;
     };
   };
+  options: {
+    key: string;
+    value: OptionTrade;
+    indexes: {
+      'by-status': string;
+      'by-symbol': string;
+      'by-expiration': string;
+    };
+  };
 }
 
 const DB_NAME = 'hustleboard-db';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 let dbInstance: IDBPDatabase<HustleboardDB> | null = null;
 
@@ -65,8 +74,13 @@ export async function initDB(): Promise<IDBPDatabase<HustleboardDB>> {
         syncStore.createIndex('by-timestamp', 'timestamp');
       }
 
-      // Future migrations would go here
-      // if (oldVersion < 2) { ... }
+      // Version 2: Add options trading
+      if (oldVersion < 2) {
+        const optionsStore = db.createObjectStore('options', { keyPath: 'id' });
+        optionsStore.createIndex('by-status', 'status');
+        optionsStore.createIndex('by-symbol', 'symbol');
+        optionsStore.createIndex('by-expiration', 'expiration');
+      }
     },
     blocked() {
       console.warn('Database upgrade blocked - please close other tabs');
@@ -205,6 +219,46 @@ export const syncQueueDB = {
   async clear(): Promise<void> {
     const db = await getDB();
     await db.clear('syncQueue');
+  },
+};
+
+/**
+ * Options trading operations
+ */
+export const optionsDB = {
+  async getAll(): Promise<OptionTrade[]> {
+    const db = await getDB();
+    return await db.getAll('options');
+  },
+
+  async getById(id: string): Promise<OptionTrade | undefined> {
+    const db = await getDB();
+    return await db.get('options', id);
+  },
+
+  async getByStatus(status: string): Promise<OptionTrade[]> {
+    const db = await getDB();
+    return await db.getAllFromIndex('options', 'by-status', status);
+  },
+
+  async add(option: OptionTrade): Promise<string> {
+    const db = await getDB();
+    return await db.add('options', option);
+  },
+
+  async update(option: OptionTrade): Promise<string> {
+    const db = await getDB();
+    return await db.put('options', option);
+  },
+
+  async delete(id: string): Promise<void> {
+    const db = await getDB();
+    await db.delete('options', id);
+  },
+
+  async clear(): Promise<void> {
+    const db = await getDB();
+    await db.clear('options');
   },
 };
 

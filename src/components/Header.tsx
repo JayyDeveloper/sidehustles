@@ -1,34 +1,17 @@
-import { useState } from 'react';
-import { Moon, Sun, Download, Menu, Trash2 } from 'lucide-react';
+import { Moon, Sun, Download, Menu } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { usePWA } from '../hooks/usePWA';
-import { clearDatabase } from '../lib/seed';
-import { Modal } from './Modal';
-import { Button } from './Button';
 
 interface HeaderProps {
   onMenuClick?: () => void;
 }
 
 export function Header({ onMenuClick }: HeaderProps) {
-  const { settings, toggleTheme, reloadHustles, toast } = useApp();
+  const { settings, toggleTheme } = useApp();
   const { canInstall, promptInstall } = usePWA();
-  const [showClearConfirm, setShowClearConfirm] = useState(false);
 
   const handleInstallClick = async () => {
     await promptInstall();
-  };
-
-  const handleClearData = async () => {
-    try {
-      await clearDatabase();
-      await reloadHustles();
-      toast.success('All data cleared successfully');
-      setShowClearConfirm(false);
-    } catch (error) {
-      console.error('Failed to clear data:', error);
-      toast.error('Failed to clear data');
-    }
   };
 
   return (
@@ -63,15 +46,6 @@ export function Header({ onMenuClick }: HeaderProps) {
 
           {/* Actions */}
           <div className="flex items-center gap-2">
-            {/* Clear data button */}
-            <button
-              onClick={() => setShowClearConfirm(true)}
-              className="p-2 rounded-xl hover:bg-red-500/10 text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300 transition-all duration-200"
-              title="Clear all data"
-            >
-              <Trash2 className="w-5 h-5" />
-            </button>
-
             {/* Install PWA button */}
             {canInstall && (
               <button
@@ -99,36 +73,6 @@ export function Header({ onMenuClick }: HeaderProps) {
           </div>
         </div>
       </div>
-
-      {/* Clear data confirmation modal */}
-      <Modal
-        isOpen={showClearConfirm}
-        onClose={() => setShowClearConfirm(false)}
-        title="Clear All Data"
-        size="sm"
-      >
-        <div className="space-y-4">
-          <p className="text-gray-300">
-            Are you sure you want to clear all data? This will permanently delete all your hustles,
-            transactions, notes, and other data.
-          </p>
-          <p className="text-sm text-red-400 font-medium">
-            This action cannot be undone!
-          </p>
-          <div className="flex gap-3">
-            <Button variant="danger" onClick={handleClearData} className="flex-1">
-              Clear All Data
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={() => setShowClearConfirm(false)}
-              className="flex-1"
-            >
-              Cancel
-            </Button>
-          </div>
-        </div>
-      </Modal>
     </header>
   );
 }
